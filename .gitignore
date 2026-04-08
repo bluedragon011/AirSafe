@@ -5,6 +5,14 @@
 # Prerequisites
 *.d
 
+#Logs & Database data (not added defaultly)
+data/*.db
+data/*.log
+data/*.dat
+
+#Vscode
+.vscode/
+
 # Object files
 *.o
 *.ko
