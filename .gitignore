@@ -5,6 +5,14 @@
 # Prerequisites
 *.d
 
+#Logs & Database data (not added defaultly)
+#data/*.db #De momento se guardarán los cambios hechos en la Base de Datos
+data/*.log
+#data/*.dat
+
+#Vscode
+.vscode/
+
 # Object files
 *.o
 *.ko
