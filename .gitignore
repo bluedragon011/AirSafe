@@ -6,9 +6,9 @@
 *.d
 
 #Logs & Database data (not added defaultly)
-data/*.db
+#data/*.db #De momento se guardarán los cambios hechos en la Base de Datos
 data/*.log
-data/*.dat
+#data/*.dat
 
 #Vscode
 .vscode/
