@@ -30,4 +30,39 @@ typedef struct {
     int id_avion;           //FK a Aviones
 } Vuelo;
 
+
+// Estructura Aeropuerto
+typedef struct {
+    int id_aeropuerto;
+    char nombre[100];
+    char ciudad[100];
+    char pais[100];
+    double latitud;
+    double longitud;
+} Aeropuerto;
+
+// Estructura Ruta
+typedef struct {
+    int id_ruta;
+    int id_origen;
+    int id_destino;
+} Ruta;
+
+// Estructura Asiento
+typedef struct {
+    int id_asiento;
+    char num_asiento[10];
+    int id_avion; // FK a Avion
+} Asiento;
+
+// Estructura Reserva
+typedef struct {
+    int id_reserva;
+    int id_usuario;   // FK a Usuario
+    char fecha_reserva[20];
+    float precio;
+    int id_vuelo;     // FK a Vuelo
+    int id_asiento;   // FK a Asiento
+} Reserva;
+
 #endif // MODELS_H
