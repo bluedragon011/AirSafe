@@ -39,7 +39,7 @@ void crearVuelo() {
     nuevo.fecha_salida[strcspn(nuevo.fecha_salida, "\n")] = 0;
 
     printf("Fecha de llegada (YYYY-MM-DD HH:MM:SS): ");
-    fgets(nuevo.fecha_llegada, sizeof(nuevo.fecha_llegada), stdin); // Corregido el sizeof
+    fgets(nuevo.fecha_llegada, sizeof(nuevo.fecha_llegada), stdin);
     nuevo.fecha_llegada[strcspn(nuevo.fecha_llegada, "\n")] = 0;
 
     printf("Ruta (Ej: Barajas-Seve Ballesteros): ");
@@ -83,7 +83,7 @@ void eliminarVuelo() {
         sqlite3_bind_int(stmt, 1, id);
 
         if (sqlite3_step(stmt) == SQLITE_DONE) {
-            int filas = sqlite3_changes(db); // Nos dice si realmente se borró algo
+            int filas = sqlite3_changes(db);
             if (filas > 0)
                 printf(">> [EXITO] Vuelo con ID %d eliminado.\n", id);
             else

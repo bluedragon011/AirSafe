@@ -65,7 +65,6 @@ void buscarVuelos() {
         return;
     }
     
-    // SQL corregido (añadida coma y ordenada la ruta)
     const char *sql = "SELECT V.id_vuelo, V.fecha_salida, IFNULL(A.matricula, 'SIN ASIGNAR'), V.ruta "
                       "FROM Vuelos V LEFT JOIN Aviones A ON V.id_avion = A.id_avion "
                       "WHERE V.id_vuelo = ?;";
@@ -84,11 +83,10 @@ void buscarVuelos() {
         printf("Fecha:    %s\n", sqlite3_column_text(res, 1));
         printf("Avion:    %s\n", sqlite3_column_text(res, 2));
 
-        // Manejo de la ruta con strtok
         const char *ruta_raw = (const char*)sqlite3_column_text(res, 3);
         if (ruta_raw != NULL) {
             char ruta_copy[100];
-            strcpy(ruta_copy, ruta_raw); // Copiamos para no romper el puntero original
+            strcpy(ruta_copy, ruta_raw);
 
             char *origen = strtok(ruta_copy, "-");
             char *destino = strtok(NULL, "-");
