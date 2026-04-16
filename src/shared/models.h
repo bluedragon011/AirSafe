@@ -1,13 +1,13 @@
-#ifndef MODELS_H
-#define MODELS_H
+#ifndef MODELS_H_
+#define MODELS_H_
 
-// --- Estructura para Aerolineas ---
+// Estructura Aerolineas
 typedef struct {
     int id_aerolinea; //PK
     char nombre[50];
 } Aerolinea;
 
-// --- Estructura para Aviones ---
+// Estructura Aviones
 typedef struct {
     int id_avion; //PK
     char matricula[15];
@@ -15,19 +15,20 @@ typedef struct {
     int id_aerolinea; //FK a Aerolineas
 } Avion;
 
-// --- Estructura para Config_cabina ---
+// Estructura Config_cabina
 typedef struct {
     int id_avion;      //FK a Aviones
     int num_filas;
     int asientos_por_fila;
 } ConfigCabina;
 
-// --- Estructura para Vuelos ---
+// Estructura Vuelo
 typedef struct {
     int id_vuelo;
-    char fecha_salida[20];  //Formato "YYYY-MM-DD HH:MM:SS"
-    char fecha_llegada[20]; //Formato "YYYY-MM-DD HH:MM:SS"
-    int id_avion;           //FK a Aviones
+    char fecha_salida[20];
+    char fecha_llegada[20];
+    int id_avion;
+    char ruta[100];
 } Vuelo;
 
 
@@ -65,4 +66,15 @@ typedef struct {
     int id_asiento;   // FK a Asiento
 } Reserva;
 
-#endif // MODELS_H
+ /* Estructura Usuario*/
+typedef struct {
+    int  id_usuario; //PK
+    char nombre[100];
+    char email[100];
+    char pasaporte[40];
+    char password_hash[64];
+    char telefono[20];
+    char tipo_usuario[10]; /* "ADMIN" o "CLIENTE" */
+} Usuario;
+
+#endif // MODELS_H_
