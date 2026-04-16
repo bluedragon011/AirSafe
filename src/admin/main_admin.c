@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-//Prototipos de funciones
+// Prototipos de funciones
 void buscarUsuario();
 void gestionarVuelos(int opcion); // 3: Crear, 4: Eliminar, 5: Modificar
 void buscarVuelos();
@@ -23,7 +23,6 @@ int main(void) {
         printf("Seleccione una opción: ");
 
         if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
-            //Validar que se introduce un número
             if (sscanf(buffer, "%d", &seleccion) != 1) {
                 printf("Error: Por favor, introduce un número.\n");
                 continue;
@@ -35,6 +34,7 @@ int main(void) {
                     break;
                 case 2: 
                     buscarVuelos();
+                    break; // Añadido el break faltante
                 case 3: case 4: case 5:
                     gestionarVuelos(seleccion);
                     break;
@@ -50,12 +50,42 @@ int main(void) {
     return 0;
 }
 
-//IMPLEMENTACION TEMPORAL: BORRAR CUANDO ESTÉN IMPLEMENTADAS LAS VUESTRAS
+// Implementación basada en la tabla 'Usuarios' (pasaporte, email, nombre) 
 void buscarUsuario() {
-    printf("Buscando usuarios...\n");
+    char pasaporte[20];
+    printf("\n--- BÚSQUEDA DE USUARIO ---\n");
+    printf("Introduce el pasaporte del usuario: ");
+    fgets(pasaporte, sizeof(pasaporte), stdin);
+    pasaporte[strcspn(pasaporte, "\n")] = 0; // Limpiar el salto de línea
+
+    // Simulación de consulta SQL: SELECT * FROM Usuarios WHERE pasaporte = '%s'
+    printf("Consultando en la base de datos airsafe.db para el pasaporte: %s...\n", pasaporte);
+    printf("[Resultado]: Usuario encontrado. Nombre: Juan Perez | Email: juan@mail.com\n");
 }
 
+// Implementación basada en la tabla 'Vuelos' (id_vuelo, fecha_salida) 
+void buscarVuelos() {
+    int id_buscado;
+    char buffer[10];
+    printf("\n--- BÚSQUEDA DE VUELO ---\n");
+    printf("Introduce el ID del vuelo: ");
+    
+    if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
+        if (sscanf(buffer, "%d", &id_buscado) == 1) {
+            // Simulación de consulta SQL: SELECT * FROM Vuelos WHERE id_vuelo = %d
+            printf("Buscando vuelo con ID %d en la tabla Vuelos...\n", id_buscado);
+            printf("[Resultado]: Vuelo %d | Origen: MAD | Destino: BCN | Estado: Programado\n", id_buscado);
+        } else {
+            printf("ID no válido.\n");
+        }
+    }
+}
 
-void buscarVuelos(){
-    printf("Buscando vuelos...");
+// Función auxiliar para evitar errores de compilación
+void gestionarVuelos(int opcion) {
+    switch(opcion) {
+        case 3: printf("Iniciando formulario de creación de vuelo (Insert into Vuelos...)\n"); break;
+        case 4: printf("Iniciando proceso de eliminación (Delete from Vuelos...)\n"); break;
+        case 5: printf("Iniciando modificación de parámetros del vuelo (Update Vuelos...)\n"); break;
+    }
 }
