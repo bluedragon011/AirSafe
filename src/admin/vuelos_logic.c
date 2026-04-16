@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "models.h"
 //FUNCION AUXILIAR PARA LIMPIAR RASTRO DEL TECLADO
 void limpiarBuffer(){
     int c;
@@ -16,7 +17,7 @@ void crearVuelo(){
     limpiarBuffer();
 
     printf("fecha de salida  (YYYY-MM-DD HH:MM:SS): ");
-    fgets(nuevo.fecha_salida, sizeof(nuevo.fecha_salida), stdin);// para guardar datos y teniendo limite
+    fgets(nuevo.fecha_salida, sizeof(nuevo.fecha_salida), stdin);//para guardar datos y teniendo limite
     nuevo.fecha_salida[strcspn(nuevo.fecha_salida, "\n")] = 0; //borra salto linea y guardarlo mejor
 
     printf("fecha de llegada (YYYY-MM-DD HH:MM:SS): ");
@@ -69,6 +70,6 @@ void gestionarVuelos(int opcion){
            modificarVuelo();
            break;
         default:
-        printf("opcion no reconocida. \n")
+        printf("opcion no reconocida. \n");
     }
 }

@@ -55,9 +55,6 @@ void buscarUsuario() {
     printf("Buscando usuarios...\n");
 }
 
-void gestionarVuelos(int opcion) {
-    printf("[Modulo gestion de vuelos...] Opcion %d introducida\n", opcion);
-}
 
 void buscarVuelos(){
     printf("Buscando vuelos...");
