@@ -5,7 +5,25 @@
 #include "../shared/auth.h"
 #include "../shared/models.h" //Los structs creados a partir de la bd
 
+char RUTA_DB[150] = "data/airsafe.db";
 
+void cargarConfiguracion() {
+    FILE *f = fopen("data/config.dat", "r");
+    if (f != NULL) { //archivo no vacio
+        char linea[150];
+        while (fgets(linea, sizeof(linea), f)) {
+            //Buscamos la línea que empieza por db_path=
+            if (strncmp(linea, "db_path=", 8) == 0) {
+                strcpy(RUTA_DB, linea + 8);
+                RUTA_DB[strcspn(RUTA_DB, "\n")] = 0;
+            }
+        }
+        fclose(f);
+        printf(">> [CONFIG] Base de datos cargada desde: %s\n", RUTA_DB);
+    } else {
+        printf(">> [CONFIG] No se encontró config.dat, usando ruta por defecto.\n");
+    }
+}
 
 
 // Función auxiliar para manejar errores de SQLite
@@ -28,7 +46,7 @@ void buscarUsuario() {
     fgets(pasaporte, sizeof(pasaporte), stdin);
     pasaporte[strcspn(pasaporte, "\n")] = 0;
 
-    int rc = sqlite3_open("data/airsafe.db", &db);
+    int rc = sqlite3_open(RUTA_DB, &db);    
     check_db_error(rc, db);
 
     const char *sql = "SELECT nombre, email, telefono FROM Usuarios WHERE pasaporte = ?;";
@@ -60,7 +78,7 @@ void buscarVuelos() {
     fgets(buffer, sizeof(buffer), stdin);
     if (sscanf(buffer, "%d", &id_buscado) != 1) return;
 
-    if (sqlite3_open("data/airsafe.db", &db) != SQLITE_OK) {
+    if (sqlite3_open(RUTA_DB, &db)!= SQLITE_OK) {
         printf("Error al abrir la base de datos\n");
         return;
     }
@@ -119,6 +137,10 @@ int panelAcceso();
 
 // ----------------- MAIN -------------------
 int main(void) {
+
+    //cargar bd
+    cargarConfiguracion();
+
     int running = 1; 
     char buffer[10];
     int seleccion;

@@ -5,6 +5,7 @@
 #include "../shared/auth.h"
 #include "../shared/models.h"
 
+
 //Función interna para no repetir código de apertura
 static sqlite3* conectarDB() {
     sqlite3 *db;
