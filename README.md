@@ -12,7 +12,7 @@ gcc src/admin/main_admin.c src/admin/vuelos_logic.c src/shared/sqlite3.c src/sha
 ----------------
 Razones:
 - Isrc/shared: estamos diciendole al compilador que busque los .h en shared, no solo en la misma carpeta donde estan los .c
-- D_WIN32_WINNT=0x0601: especificacion de dispositivo en el que se esta trabajando (Windows en este caso). En caso de trabajar en Linux, modificar esta parte por: 
+- D_WIN32_WINNT=0x0601: especificacion de dispositivo en el que se esta trabajando (Windows en este caso). En caso de trabajar en Linux, mirar apartado Linux.
 - lkernel32: enlazado de los archivos a compilar con Windows (permisos a SQLite).
 -----------------------------
 *EN CASO DE USAR LINUX*:
