@@ -4,6 +4,7 @@
 #include "../shared/sqlite3.h"
 #include "../shared/auth.h"
 #include "../shared/models.h"
+#include "../shared/logs.h"
 
 // FUNCION AUXILIAR PARA LIMPIAR RASTRO DEL TECLADO
 void limpiarBuffer() {
@@ -100,33 +101,116 @@ void modificarVuelo() {
     if (!db) return;
 
     int id;
-    char nueva_fecha[20];
     sqlite3_stmt *stmt;
+    int opcion;
+    char buffer[10];
 
     printf("\n---- MODO: MODIFICAR VUELO ------\n");
     printf("Introduce el ID del vuelo a editar: ");
     scanf("%d", &id);
     limpiarBuffer();
 
-    printf("Nueva Fecha de Salida (YYYY-MM-DD HH:MM): ");
-    fgets(nueva_fecha, sizeof(nueva_fecha), stdin);
-    nueva_fecha[strcspn(nueva_fecha, "\n")] = 0;
-
-    const char *sql = "UPDATE Vuelos SET fecha_salida = ? WHERE id_vuelo = ?;";
-
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK) {
-        sqlite3_bind_text(stmt, 1, nueva_fecha, -1, SQLITE_STATIC);
-        sqlite3_bind_int(stmt, 2, id);
-
-        if (sqlite3_step(stmt) == SQLITE_DONE) {
-            if (sqlite3_changes(db) > 0)
-                printf(">> [EXITO] Vuelo ID %d actualizado correctamente.\n", id);
-            else
-                printf(">> [INFO] El ID %d no existe.\n", id);
+    // Primero verificamos si el vuelo existe
+    const char *sql_check = "SELECT COUNT(*) FROM Vuelos WHERE id_vuelo = ?;";
+    int existe = 0;
+    if (sqlite3_prepare_v2(db, sql_check, -1, &stmt, NULL) == SQLITE_OK) {
+        sqlite3_bind_int(stmt, 1, id);
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            existe = sqlite3_column_int(stmt, 0);
         }
+        sqlite3_finalize(stmt);
     }
 
-    sqlite3_finalize(stmt);
+    if (!existe) {
+        printf(">> [INFO] El ID de vuelo %d no existe.\n", id);
+        sqlite3_close(db);
+        return;
+    }
+
+    // Menú interno de modificaciones
+    printf("\n¿Qué campo deseas modificar?\n");
+    printf("1. Fecha de Salida (YYYY-MM-DD HH:MM:SS)\n");
+    printf("2. Ruta / Trayecto (Ej: Madrid-Barcelona)\n");
+    printf("3. ID del Avión Asignado\n");
+    printf("Seleccione una opción: ");
+    
+    fgets(buffer, sizeof(buffer), stdin);
+    if (sscanf(buffer, "%d", &opcion) != 1) {
+        printf("Error: Opción no válida.\n");
+        sqlite3_close(db);
+        return;
+    }
+
+    if (opcion == 1) {
+        char nueva_fecha[25];
+        printf("Nueva Fecha de Salida (YYYY-MM-DD HH:MM:SS): ");
+        fgets(nueva_fecha, sizeof(nueva_fecha), stdin);
+        nueva_fecha[strcspn(nueva_fecha, "\n")] = 0;
+
+        const char *sql = "UPDATE Vuelos SET fecha_salida = ? WHERE id_vuelo = ?;";
+        if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK) {
+            sqlite3_bind_text(stmt, 1, nueva_fecha, -1, SQLITE_STATIC);
+            sqlite3_bind_int(stmt, 2, id);
+            
+            if (sqlite3_step(stmt) == SQLITE_DONE) {
+                printf(">> [EXITO] Fecha de salida actualizada.\n");
+                
+                // USAMOS TU LOG: Creamos un mensaje informativo
+                char msg_log[100];
+                sprintf(msg_log, "ADMIN modificó la fecha del vuelo ID %d a: %s", id, nueva_fecha);
+                registrar_log(msg_log);
+            }
+        }
+        sqlite3_finalize(stmt);
+
+    } else if (opcion == 2) {
+        char nueva_ruta[100];
+        printf("Nueva Ruta (Ej: Origen-Destino): ");
+        fgets(nueva_ruta, sizeof(nueva_ruta), stdin);
+        nueva_ruta[strcspn(nueva_ruta, "\n")] = 0;
+
+        const char *sql = "UPDATE Vuelos SET ruta = ? WHERE id_vuelo = ?;";
+        if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK) {
+            sqlite3_bind_text(stmt, 1, nueva_ruta, -1, SQLITE_STATIC);
+            sqlite3_bind_int(stmt, 2, id);
+            
+            if (sqlite3_step(stmt) == SQLITE_DONE) {
+                printf(">> [EXITO] Ruta del vuelo actualizada.\n");
+                
+                // USAMOS TU LOG
+                char msg_log[100];
+                sprintf(msg_log, "ADMIN modificó la ruta del vuelo ID %d a: %s", id, nueva_ruta);
+                registrar_log(msg_log);
+            }
+        }
+        sqlite3_finalize(stmt);
+
+    } else if (opcion == 3) {
+        int nuevo_avion;
+        printf("Introduce el ID del nuevo Avión: ");
+        scanf("%d", &nuevo_avion);
+        limpiarBuffer();
+
+        const char *sql = "UPDATE Vuelos SET id_avion = ? WHERE id_vuelo = ?;";
+        if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK) {
+            sqlite3_bind_int(stmt, 1, nuevo_avion);
+            sqlite3_bind_int(stmt, 2, id);
+            
+            if (sqlite3_step(stmt) == SQLITE_DONE) {
+                printf(">> [EXITO] Avión asignado al vuelo actualizado.\n");
+                
+                // USAMOS TU LOG
+                char msg_log[100];
+                sprintf(msg_log, "ADMIN modificó el avión del vuelo ID %d al ID de avión: %d", id, nuevo_avion);
+                registrar_log(msg_log);
+            }
+        }
+        sqlite3_finalize(stmt);
+
+    } else {
+        printf("Opción no reconocida.\n");
+    }
+
     sqlite3_close(db);
 }
 
