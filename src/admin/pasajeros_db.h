@@ -1,4 +1,4 @@
-int comprarVueloDB(int id_usuario, int id_vuelo);
+int comprarVueloDB(int id_usuario, int id_vuelo, int id_asiento);
 void consultarMisVuelosDB(int id_usuario);
 //Funciones adaptadas para enviar datos por Sockets
 void obtenerVuelosRed(char *buffer);

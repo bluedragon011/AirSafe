@@ -104,13 +104,17 @@ void atenderCliente(SOCKET socket_cliente) {
                 send(socket_cliente, buffer_respuesta, strlen(buffer_respuesta), 0);
             }
             else if (comando == "COMPRAR_VUELO") {
-                //Peticion: COMPRAR_VUELO|id_usr|id_vuelo|id_asiento|precio
+                //Peticion del cliente: COMPRAR_VUELO|id_usr|id_vuelo|id_asiento|precio
                 int pos2 = mensaje.find('|', pos1 + 1);
                 int pos3 = mensaje.find('|', pos2 + 1);
+                int pos4 = mensaje.find('|', pos3 + 1);
+                
                 int id_usr = stoi(mensaje.substr(pos1 + 1, pos2 - pos1 - 1));
                 int id_vuelo = stoi(mensaje.substr(pos2 + 1, pos3 - pos2 - 1));
+                int id_asiento = stoi(mensaje.substr(pos3 + 1, pos4 - pos3 - 1));
                 
-                int res = comprarVueloDB(id_usr, id_vuelo);
+                int res = comprarVueloDB(id_usr, id_vuelo, id_asiento);
+                
                 if (res == 1) {
                     send(socket_cliente, "COMPRA_OK", 9, 0);
                     registrar_log("Compra de billete realizada por red.");

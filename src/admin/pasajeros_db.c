@@ -8,7 +8,7 @@
 extern char RUTA_DB[150]; 
 
 // FUNCIONALIDAD 1: COMPRAR VUELO CON CONTROL DE AFORO REAL
-int comprarVueloDB(int id_usuario, int id_vuelo) {
+int comprarVueloDB(int id_usuario, int id_vuelo, int id_asiento) {
     sqlite3 *db;
     sqlite3_stmt *stmt;
     int rc;
@@ -69,7 +69,7 @@ int comprarVueloDB(int id_usuario, int id_vuelo) {
 
     sqlite3_bind_int(stmt, 1, id_usuario);
     sqlite3_bind_int(stmt, 2, id_vuelo);
-    sqlite3_bind_int(stmt, 3, siguiente_asiento);
+    sqlite3_bind_int(stmt, 3, id_asiento);
 
     if (sqlite3_step(stmt) == SQLITE_DONE) {
         printf(">> [EXITO] Reserva completada. Usuario %d -> Vuelo %d (Asiento asignado: %d).\n", 
