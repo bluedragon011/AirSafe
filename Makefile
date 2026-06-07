@@ -1,47 +1,74 @@
-# Nombre del archivo ejecutable final
-TARGET = airsafe_app
+# MAKEFILE
 
-# Compiladores para C y C++
+#Compiladores
 CC = gcc
 CXX = g++
 
-# Banderas de optimización y errores
-CFLAGS = -Wall -Wextra -g
-CXXFLAGS = -Wall -Wextra -std=c++11 -g
+#Opciones de compilación (Banderas de Windows y rutas)
+CFLAGS = -Isrc/shared -D_WIN32_WINNT=0x0601
+CXXFLAGS = -Isrc/shared -D_WIN32_WINNT=0x0601
+LDFLAGS = -lws2_32
 
-# Carpetas del proyecto
-ADMIN_DIR = src/admin
-SHARED_DIR = src/shared
+#Carpeta de salida
+BUILD_DIR = build
 
-# 1. ARCHIVOS FUENTE (.c) de tu bloque, admin y compartidos
-SRCS_C = $(ADMIN_DIR)/main_admin.c \
-         $(ADMIN_DIR)/vuelos_logic.c \
-         $(ADMIN_DIR)/pasajeros_db.c \
-         $(SHARED_DIR)/auth.c \
-         $(SHARED_DIR)/logs.c \
-         $(SHARED_DIR)/sqlite3.c
+#Archivos Objeto pre-compilados (C puro)
+OBJ_SQLITE = $(BUILD_DIR)/sqlite3.o
+OBJ_AUTH = $(BUILD_DIR)/auth.o
+OBJ_LOGS = $(BUILD_DIR)/logs.o
+OBJ_PASAJEROS = $(BUILD_DIR)/pasajeros_db.o
 
-# 2. ARCHIVOS FUENTE (.cpp) - Reservado para cuando el Bloque 2 cree el cliente C++
-# Nota: Si tu compañero los nombra distinto, solo habrá que actualizar esta línea
-SRCS_CPP = 
+#Ejecutables finales
+TARGET_SERVER = $(BUILD_DIR)/server.exe
+TARGET_CLIENT = $(BUILD_DIR)/client.exe
+TARGET_ADMIN = $(BUILD_DIR)/admin.exe
 
-# Transformación de archivos .c y .cpp en archivos objeto .o
-OBJS = $(SRCS_C:.c=.o) $(SRCS_CPP:.cpp=.o)
 
-# Regla principal de compilación
-$(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS) -lpthread -ldl
-	@echo ">> [EXITO] AirSafe compilado correctamente como './$(TARGET)'"
+#Reglas:
+#Compilacion
+all: directorios $(TARGET_SERVER) $(TARGET_CLIENT) $(TARGET_ADMIN)
+	@echo ">> COMPILACION COMPLETADA CON EXITO <<"
 
-# Cómo compilar los archivos individuales de C
-%.o: %.c
+#Crear carpeta build para meter los .exe
+directorios:
+	@mkdir -p $(BUILD_DIR)
+
+#COMPILACION DE OBJETOS (C PURO)
+$(OBJ_SQLITE): src/shared/sqlite3.c
+	@echo "Compilando SQLite..."
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Cómo compilar los archivos individuales de C++
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(OBJ_AUTH): src/shared/auth.c
+	@echo "Compilando Auth..."
+	$(CC) $(CFLAGS) -c $< -o $@
 
-# Regla para limpiar los archivos temporales de la carpeta
+$(OBJ_LOGS): src/shared/logs.c
+	@echo "Compilando Logs..."
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_PASAJEROS): src/admin/pasajeros_db.c
+	@echo "Compilando DB Pasajeros..."
+	$(CC) $(CFLAGS) -c $< -o $@
+
+
+#ENLACE DE EJECUTABLES
+
+#Servidor (C++ con objetos C)
+$(TARGET_SERVER): src/admin/server.cpp $(OBJ_AUTH) $(OBJ_LOGS) $(OBJ_PASAJEROS) $(OBJ_SQLITE)
+	@echo "Enlazando Servidor..."
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
+
+#Cliente (C++)
+$(TARGET_CLIENT): src/client/client.cpp
+	@echo "Enlazando Cliente..."
+	$(CXX) $(CXXFLAGS) $< -o $@ $(LDFLAGS)
+
+#Administrador (C)
+$(TARGET_ADMIN): src/admin/main_admin.c src/admin/vuelos_logic.c $(OBJ_AUTH) $(OBJ_LOGS) $(OBJ_SQLITE)
+	@echo "Enlazando Administrador..."
+	$(CC) $(CFLAGS) $^ -o $@
+
+#LIMPIEZA
 clean:
-	rm -f $(ADMIN_DIR)/*.o $(SHARED_DIR)/*.o *.o $(TARGET)
-	@echo ">> [LIMPIEZA] Archivos temporales (.o) eliminados con éxito."
+	@echo "Limpiando binarios..."
+	rm -rf $(BUILD_DIR)/*.o $(BUILD_DIR)/*.exe
