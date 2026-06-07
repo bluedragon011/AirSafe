@@ -8,7 +8,7 @@
 char RUTA_DB[150] = "data/airsafe.db";
 
 void cargarConfiguracion() {
-    FILE *f = fopen("data/config.dat", "r");
+    FILE *f = fopen("../data/config.dat", "r");
     if (f != NULL) { //archivo no vacio
         char linea[150];
         while (fgets(linea, sizeof(linea), f)) {

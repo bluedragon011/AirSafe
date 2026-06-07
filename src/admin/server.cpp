@@ -23,7 +23,7 @@ int PUERTO_SERVER = 8080;
 
 
 void cargarConfiguracion() {
-    ifstream f("data/config.dat");
+    ifstream f("../data/config.dat");
     if (f.is_open()) {
         string linea;
         while (getline(f, linea)) {

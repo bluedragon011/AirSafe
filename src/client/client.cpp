@@ -79,7 +79,7 @@ string IP_SERVER = "127.0.0.1";
 int PUERTO_SERVER = 8080;
 
 void cargarConfiguracion() {
-    ifstream f("data/config.dat");
+    ifstream f("../data/config.dat");
     if (f.is_open()) {
         string linea;
         while (getline(f, linea)) {
