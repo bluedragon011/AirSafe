@@ -3,10 +3,10 @@
 #include <string.h>
 #include "../shared/sqlite3.h"
 #include "../shared/models.h"
+#include "auth.h"
 
-//Usamos la variable global parametrizada por el fichero de configuración de la Fase 1
-extern char RUTA_DB[150]; 
-
+extern char RUTA_DB_C[];
+#define RUTA_DB (RUTA_DB_C != NULL && RUTA_DB_C[0] != '\0' ? RUTA_DB_C : "data/airsafe.db")
 // FUNCIONALIDAD 1: COMPRAR VUELO CON CONTROL DE AFORO REAL
 int comprarVueloDB(int id_usuario, int id_vuelo, int id_asiento) {
     sqlite3 *db;
