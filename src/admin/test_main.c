@@ -1,4 +1,4 @@
-#include <stdio.h>
+/*#include <stdio.h>
 #include "pasajeros_db.h"
 
 //Archivo temporal para probar funcionalidades. 
@@ -30,4 +30,4 @@ int main() {
 
     printf("\n=== PRUEBAS FINALIZADAS ===\n");
     return 0;
-}
+}*/
