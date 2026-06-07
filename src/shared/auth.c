@@ -199,3 +199,34 @@ int panelAcceso(void) {
     return 0;
 
 }
+
+extern char RUTA_DB_C[]; 
+
+int obtenerIdUsuario(const char *email) {
+    sqlite3 *db;
+    sqlite3_stmt *stmt;
+    int id_usuario = -1;
+
+    const char* ruta_final = (RUTA_DB_C != NULL && strlen(RUTA_DB_C) > 0) ? RUTA_DB_C : "data/airsafe.db";
+
+    if (sqlite3_open(ruta_final, &db) != SQLITE_OK) {
+        printf(">> [ERROR] No se pudo abrir la BD en obtenerIdUsuario.\n");
+        return -1;
+    }
+
+    const char *sql = "SELECT id_usuario FROM Usuarios WHERE email = ?;";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, email, -1, SQLITE_STATIC);
+
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            id_usuario = sqlite3_column_int(stmt, 0);
+        }
+        sqlite3_finalize(stmt);
+    } else {
+        printf(">> [ERROR SQL] Fallo al preparar consulta en obtenerIdUsuario: %s\n", sqlite3_errmsg(db));
+    }
+
+    sqlite3_close(db);
+    return id_usuario;
+}

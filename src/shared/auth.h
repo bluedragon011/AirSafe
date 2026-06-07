@@ -17,4 +17,6 @@ int iniciarSesion(void);
 
 void registrarUsuario(void);
 
+int obtenerIdUsuario(const char *email);
+
 #endif

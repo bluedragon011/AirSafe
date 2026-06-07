@@ -141,3 +141,110 @@ void consultarMisVuelosDB(int id_usuario) {
 
     sqlite3_close(db);
 }
+
+// FUNCIONES DE INTEGRACIÓN CON LA RED
+void obtenerVuelosRed(char *buffer) {
+    sqlite3 *db;
+    sqlite3_stmt *stmt;
+    buffer[0] = '\0'; //vaciamos el buffer
+
+    if (sqlite3_open(RUTA_DB, &db) != SQLITE_OK) {
+        strcpy(buffer, "ERROR_DB\n");
+        return;
+    }
+
+    const char *sql = "SELECT id_vuelo, fecha_salida, fecha_llegada, id_avion, ruta FROM Vuelos WHERE fecha_salida >= datetime('now');";
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK) {
+        char linea[200];
+        int encontrados = 0;
+        //el formato a usar: id|salida|llegada|id_avion|ruta
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            encontrados++;
+            sprintf(linea, "%d|%s|%s|%d|%s\n",
+                    sqlite3_column_int(stmt, 0),
+                    sqlite3_column_text(stmt, 1),
+                    sqlite3_column_text(stmt, 2),
+                    sqlite3_column_int(stmt, 3),
+                    sqlite3_column_text(stmt, 4));
+            strcat(buffer, linea); //Añadimos la linea al buffer general
+        }
+        if (encontrados == 0) strcpy(buffer, "VACIO\n");
+    } else {
+        strcpy(buffer, "ERROR_CONSULTA\n");
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+}
+
+void obtenerHistorialRed(int id_usuario, char *buffer) {
+    sqlite3 *db;
+    sqlite3_stmt *stmt;
+    buffer[0] = '\0';
+
+    if (sqlite3_open(RUTA_DB, &db) != SQLITE_OK) {
+        strcpy(buffer, "ERROR_DB\n");
+        return;
+    }
+
+    const char *sql = "SELECT R.id_reserva, V.fecha_salida, V.ruta, R.id_asiento, R.precio "
+                      "FROM Reserva R JOIN Vuelos V ON R.id_vuelo = V.id_vuelo WHERE R.id_usuario = ?;";
+    
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK) {
+        sqlite3_bind_int(stmt, 1, id_usuario);
+        char linea[200];
+        int encontrados = 0;
+        //formato: id_reserva|fecha|ruta|asiento|precio
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            encontrados++;
+            sprintf(linea, "%d|%s|%s|%d|%.2f\n",
+                    sqlite3_column_int(stmt, 0),
+                    sqlite3_column_text(stmt, 1),
+                    sqlite3_column_text(stmt, 2),
+                    sqlite3_column_int(stmt, 3),
+                    sqlite3_column_double(stmt, 4));
+            strcat(buffer, linea);
+        }
+        if (encontrados == 0) strcpy(buffer, "VACIO\n");
+    } else {
+        strcpy(buffer, "ERROR_CONSULTA\n");
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+}
+
+void obtenerAsientosLibresRed(int id_vuelo, char *buffer) {
+    sqlite3 *db;
+    sqlite3_stmt *stmt;
+    buffer[0] = '\0';
+
+    if (sqlite3_open(RUTA_DB, &db) != SQLITE_OK) {
+        strcpy(buffer, "ERROR_DB\n");
+        return;
+    }
+
+    //buscamos asientos del avion que NO esten ya en una reserva para este vuelo
+    const char *sql = "SELECT A.id_asiento, A.num_asiento FROM Asiento A "
+                      "JOIN Vuelos V ON A.id_avion = V.id_avion "
+                      "WHERE V.id_vuelo = ? AND A.id_asiento NOT IN "
+                      "(SELECT id_asiento FROM Reserva WHERE id_vuelo = ?);";
+    
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK) {
+        sqlite3_bind_int(stmt, 1, id_vuelo);
+        sqlite3_bind_int(stmt, 2, id_vuelo);
+        char linea[100];
+        int encontrados = 0;
+        //formato: id_asiento|num_asiento
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            encontrados++;
+            sprintf(linea, "%d|%s\n",
+                    sqlite3_column_int(stmt, 0),
+                    sqlite3_column_text(stmt, 1));
+            strcat(buffer, linea);
+        }
+        if (encontrados == 0) strcpy(buffer, "VACIO\n");
+    } else {
+        strcpy(buffer, "ERROR_CONSULTA\n");
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+}
