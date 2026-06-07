@@ -1,0 +1,2 @@
+DB_PATH=data/airsafe.db
+admin_default=admin@airsafe.com
