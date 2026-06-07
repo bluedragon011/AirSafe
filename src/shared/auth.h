@@ -17,6 +17,5 @@ int iniciarSesion(void);
 
 void registrarUsuario(void);
 
-int obtenerIdUsuario(const char *email);
-
+int obtenerIdUsuario(const char *email, const char *ruta_db);
 #endif

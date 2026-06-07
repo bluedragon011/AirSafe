@@ -202,12 +202,13 @@ int panelAcceso(void) {
 
 extern char RUTA_DB_C[]; 
 
-int obtenerIdUsuario(const char *email) {
+int obtenerIdUsuario(const char *email, const char *ruta_db) {
     sqlite3 *db;
     sqlite3_stmt *stmt;
     int id_usuario = -1;
 
-    const char* ruta_final = (RUTA_DB_C != NULL && strlen(RUTA_DB_C) > 0) ? RUTA_DB_C : "data/airsafe.db";
+    // Si no nos pasan una ruta válida, usamos la por defecto del proyecto
+    const char* ruta_final = (ruta_db != NULL && strlen(ruta_db) > 0) ? ruta_db : "data/airsafe.db";
 
     if (sqlite3_open(ruta_final, &db) != SQLITE_OK) {
         printf(">> [ERROR] No se pudo abrir la BD en obtenerIdUsuario.\n");

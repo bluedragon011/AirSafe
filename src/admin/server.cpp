@@ -80,7 +80,7 @@ void atenderCliente(SOCKET socket_cliente) {
                     if (validarCredenciales(c_email, c_password)) {
                         char tipo[15]; obtenerTipoUsuario(c_email, tipo);
                         if (strcmp(tipo, "CLIENTE") == 0) {
-                            int id_usr = obtenerIdUsuario(c_email);
+                            int id_usr = obtenerIdUsuario(c_email, RUTA_DB.c_str());
                             string respuesta = string(RES_LOGIN_OK) + "|" + to_string(id_usr) + "|Pasajero";
                             send(socket_cliente, respuesta.c_str(), respuesta.length(), 0);
                             registrar_log(("Login RED EXITOSO: " + email).c_str());
