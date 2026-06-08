@@ -9,7 +9,7 @@
 //Función interna para no repetir código de apertura
 static sqlite3* conectarDB() {
     sqlite3 *db;
-    if (sqlite3_open("data/airsafe.db", &db) != SQLITE_OK) {
+    if (sqlite3_open("../data/airsafe.db", &db) != SQLITE_OK) {
         fprintf(stderr, "Error conexión: %s\n", sqlite3_errmsg(db));
         return NULL;
     }

@@ -17,8 +17,8 @@ extern "C" {
 }
 
 
-string RUTA_DB = "data/airsafe.db";
-extern "C" char RUTA_DB_C[150] = "data/airsafe.db";
+string RUTA_DB = "../data/airsafe.db";
+extern "C" char RUTA_DB_C[150] = "../data/airsafe.db";
 int PUERTO_SERVER = 8080; 
 
 

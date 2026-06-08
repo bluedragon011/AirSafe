@@ -5,7 +5,7 @@
 #include "../shared/auth.h"
 #include "../shared/models.h" //Los structs creados a partir de la bd
 
-char RUTA_DB[150] = "data/airsafe.db";
+char RUTA_DB[150] = "../data/airsafe.db";
 
 void cargarConfiguracion() {
     FILE *f = fopen("../data/config.dat", "r");

@@ -6,7 +6,7 @@
 #include "auth.h"
 
 extern char RUTA_DB_C[];
-#define RUTA_DB (RUTA_DB_C != NULL && RUTA_DB_C[0] != '\0' ? RUTA_DB_C : "data/airsafe.db")
+#define RUTA_DB (RUTA_DB_C != NULL && RUTA_DB_C[0] != '\0' ? RUTA_DB_C : "../data/airsafe.db")
 // FUNCIONALIDAD 1: COMPRAR VUELO CON CONTROL DE AFORO REAL
 int comprarVueloDB(int id_usuario, int id_vuelo, int id_asiento) {
     sqlite3 *db;

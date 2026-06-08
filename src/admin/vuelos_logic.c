@@ -15,7 +15,7 @@ void limpiarBuffer() {
 // Función centralizada para abrir la base de datos
 sqlite3* abrirDB() {
     sqlite3 *db;
-    int rc = sqlite3_open("data/airsafe.db", &db);
+    int rc = sqlite3_open("../data/airsafe.db", &db);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "Error al abrir la base de datos: %s\n", sqlite3_errmsg(db));
         return NULL;
