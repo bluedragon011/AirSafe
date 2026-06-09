@@ -8,15 +8,14 @@
 #include "../shared/protocolo.h"
 
 using namespace std;
-//    NOTA PARA SERVER.CCP. BORRAR DESPUES
-// comandos extra que enviamos al server. lo que debe responder:
+
+// Los comandos del protocolo (incluidos LISTAR_VUELOS y LISTAR_ASIENTOS)
+// estan definidos en protocolo.h. Formato de las respuestas del servidor:
 //   LISTAR_VUELOS                              -> "id|salida|llegada|id_avion|ruta" por linea
 //   LISTAR_ASIENTOS|id_vuelo                   -> "id_asiento|num_asiento" por linea
 //   COMPRAR_VUELO|id_usr|id_vuelo|asiento|precio -> COMPRA_OK / COMPRA_COMPLETO / ERROR
 //   CONSULTAR_HISTORIAL|id_usr                 -> "id_reserva|fecha|ruta|asiento|precio" por linea
 //   LOGIN|email|pass                           -> "LOGIN_OK|id_usuario|nombre" / LOGIN_DENEGADO
-#define REQ_LISTAR_VUELOS   "LISTAR_VUELOS"
-#define REQ_LISTAR_ASIENTOS "LISTAR_ASIENTOS"
 
 const string PRECIO_FIJO = "49.99";
 
@@ -79,7 +78,7 @@ string IP_SERVER = "127.0.0.1";
 int PUERTO_SERVER = 8080;
 
 void cargarConfiguracion() {
-    ifstream f("../data/config.dat");
+    ifstream f("data/config.dat");
     if (f.is_open()) {
         string linea;
         while (getline(f, linea)) {
@@ -390,4 +389,3 @@ int main() {
     WSACleanup();
     return 0;
 }
-
