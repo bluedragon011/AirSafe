@@ -5,10 +5,10 @@
 #include "../shared/auth.h"
 #include "../shared/models.h" //Los structs creados a partir de la bd
 
-char RUTA_DB[150] = "../data/airsafe.db";
+char RUTA_DB[150] = "data/airsafe.db";
 
 void cargarConfiguracion() {
-    FILE *f = fopen("../data/config.dat", "r");
+    FILE *f = fopen("data/config.dat", "r");
     if (f != NULL) { //archivo no vacio
         char linea[150];
         while (fgets(linea, sizeof(linea), f)) {
@@ -132,6 +132,7 @@ void limpiarbuffer();
 void crearVuelo();
 void eliminarVuelo();
 void modificarVuelo();
+void consultarMisVuelosDB(int id_usuario);
 
 int panelAcceso();
 
@@ -154,7 +155,8 @@ int main(void) {
         printf("3. Crear vuelo\n");
         printf("4. Eliminar vuelo\n");
         printf("5. Modificar vuelo\n");
-        printf("6. Cerrar sesión\n");
+        printf("6. Consultar reservas de un usuario\n");
+        printf("7. Cerrar sesión\n");
         printf("Seleccione una opción: ");
 
         if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
@@ -167,9 +169,18 @@ int main(void) {
                 case 1: buscarUsuario(); break;
                 case 2: buscarVuelos(); break;
                 case 3: case 4: case 5: gestionarVuelos(seleccion); break;
-                case 6:
+                case 6: {
+                    int id_u;
+                    char buf_id[10];
+                    printf("Introduce el ID del usuario: ");
+                    if (fgets(buf_id, sizeof(buf_id), stdin) != NULL && sscanf(buf_id, "%d", &id_u) == 1) {
+                        consultarMisVuelosDB(id_u);
+                    }
+                    break;
+                }
+                case 7:
                     printf("Cerrando sesión...\n");
-                    running = 0; 
+                    running = 0;
                     break;
                 default:
                     fprintf(stderr, "Opción %d no válida.\n", seleccion);
