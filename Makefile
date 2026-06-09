@@ -1,74 +1,45 @@
-# MAKEFILE
+# Makefile de AirSafe
+# 'make all' compila los 3 ejecutables (admin, server, client) dentro de build/
 
-#Compiladores
-CC = gcc
-CXX = g++
+CC       = gcc
+CXX      = g++
+CFLAGS   = -Wall -O2
+CXXFLAGS = -std=c++11 -Wall -O2
+STATIC   = -static
 
-#Opciones de compilación (Banderas de Windows y rutas)
-CFLAGS = -Isrc/shared -D_WIN32_WINNT=0x0601
-CXXFLAGS = -Isrc/shared -D_WIN32_WINNT=0x0601
-LDFLAGS = -lws2_32
+BUILD  = build
+SHARED = src/shared
+ADMIN  = src/admin
+CLIENT = src/client
 
-#Carpeta de salida
-BUILD_DIR = build
+all: $(BUILD)/admin.exe $(BUILD)/server.exe $(BUILD)/client.exe
+	@echo Listo. Los 3 ejecutables estan en build/
 
-#Archivos Objeto pre-compilados (C puro)
-OBJ_SQLITE = $(BUILD_DIR)/sqlite3.o
-OBJ_AUTH = $(BUILD_DIR)/auth.o
-OBJ_LOGS = $(BUILD_DIR)/logs.o
-OBJ_PASAJEROS = $(BUILD_DIR)/pasajeros_db.o
+# Carpeta de salida
+$(BUILD):
+	@if not exist $(BUILD) mkdir $(BUILD)
 
-#Ejecutables finales
-TARGET_SERVER = $(BUILD_DIR)/server.exe
-TARGET_CLIENT = $(BUILD_DIR)/client.exe
-TARGET_ADMIN = $(BUILD_DIR)/admin.exe
+# --- Objetos compartidos (codigo C) ---
+$(BUILD)/sqlite3.o: $(SHARED)/sqlite3.c | $(BUILD)
+	$(CC) $(CFLAGS) -c $(SHARED)/sqlite3.c -o $(BUILD)/sqlite3.o
 
+$(BUILD)/auth.o: $(SHARED)/auth.c | $(BUILD)
+	$(CC) $(CFLAGS) -c $(SHARED)/auth.c -o $(BUILD)/auth.o
 
-#Reglas:
-#Compilacion
-all: directorios $(TARGET_SERVER) $(TARGET_CLIENT) $(TARGET_ADMIN)
-	@echo ">> COMPILACION COMPLETADA CON EXITO <<"
+$(BUILD)/logs.o: $(SHARED)/logs.c | $(BUILD)
+	$(CC) $(CFLAGS) -c $(SHARED)/logs.c -o $(BUILD)/logs.o
 
-#Crear carpeta build para meter los .exe
-directorios:
-	@mkdir -p $(BUILD_DIR)
+# --- Aplicacion de administrador (consola, C) ---
+$(BUILD)/admin.exe: $(ADMIN)/main_admin.c $(ADMIN)/vuelos_logic.c $(ADMIN)/pasajeros_db.c $(BUILD)/auth.o $(BUILD)/logs.o $(BUILD)/sqlite3.o | $(BUILD)
+	$(CC) $(CFLAGS) $(ADMIN)/main_admin.c $(ADMIN)/vuelos_logic.c $(ADMIN)/pasajeros_db.c $(BUILD)/auth.o $(BUILD)/logs.o $(BUILD)/sqlite3.o -o $(BUILD)/admin.exe $(STATIC)
 
-#COMPILACION DE OBJETOS (C PURO)
-$(OBJ_SQLITE): src/shared/sqlite3.c
-	@echo "Compilando SQLite..."
-	$(CC) $(CFLAGS) -c $< -o $@
+# --- Servidor de sockets (C++) ---
+$(BUILD)/server.exe: $(ADMIN)/server.cpp $(BUILD)/auth.o $(BUILD)/logs.o $(BUILD)/sqlite3.o | $(BUILD)
+	$(CXX) $(CXXFLAGS) $(ADMIN)/server.cpp $(BUILD)/auth.o $(BUILD)/logs.o $(BUILD)/sqlite3.o -o $(BUILD)/server.exe $(STATIC) -lws2_32
 
-$(OBJ_AUTH): src/shared/auth.c
-	@echo "Compilando Auth..."
-	$(CC) $(CFLAGS) -c $< -o $@
+# --- Cliente de pasajeros (C++) ---
+$(BUILD)/client.exe: $(CLIENT)/client.cpp | $(BUILD)
+	$(CXX) $(CXXFLAGS) $(CLIENT)/client.cpp -o $(BUILD)/client.exe $(STATIC) -lws2_32
 
-$(OBJ_LOGS): src/shared/logs.c
-	@echo "Compilando Logs..."
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJ_PASAJEROS): src/admin/pasajeros_db.c
-	@echo "Compilando DB Pasajeros..."
-	$(CC) $(CFLAGS) -c $< -o $@
-
-
-#ENLACE DE EJECUTABLES
-
-#Servidor (C++ con objetos C)
-$(TARGET_SERVER): src/admin/server.cpp $(OBJ_AUTH) $(OBJ_LOGS) $(OBJ_PASAJEROS) $(OBJ_SQLITE)
-	@echo "Enlazando Servidor..."
-	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
-
-#Cliente (C++)
-$(TARGET_CLIENT): src/client/client.cpp
-	@echo "Enlazando Cliente..."
-	$(CXX) $(CXXFLAGS) $< -o $@ $(LDFLAGS)
-
-#Administrador (C)
-$(TARGET_ADMIN): src/admin/main_admin.c src/admin/vuelos_logic.c $(OBJ_AUTH) $(OBJ_LOGS) $(OBJ_SQLITE)
-	@echo "Enlazando Administrador..."
-	$(CC) $(CFLAGS) $^ -o $@
-
-#LIMPIEZA
 clean:
-	@echo "Limpiando binarios..."
-	rm -rf $(BUILD_DIR)/*.o $(BUILD_DIR)/*.exe
+	@if exist $(BUILD) rmdir /s /q $(BUILD)
